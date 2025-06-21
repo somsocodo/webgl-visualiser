@@ -5,24 +5,27 @@ export class AudioManager {
   isInitialized: boolean = false;
 
   constructor() {
-    this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext);
+    this.audioContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)();
     this.analyser = this.audioContext.createAnalyser();
     this.analyser.fftSize = 2048;
-    
+
     const bufferLength = this.analyser.frequencyBinCount;
     this.dataArray = new Uint8Array(bufferLength);
   }
 
   async initialize(): Promise<MediaStream | undefined> {
     try {
-      this.audioContext.resume()
-      const stream = await navigator.mediaDevices.getDisplayMedia({ audio: true });
+      this.audioContext.resume();
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        audio: true,
+      });
       const source = this.audioContext.createMediaStreamSource(stream);
       source.connect(this.analyser);
       this.isInitialized = true;
       return stream;
     } catch (err) {
-      console.error('Error capturing system audio:', err);
+      console.error("Error capturing system audio:", err);
       return undefined;
     }
   }
