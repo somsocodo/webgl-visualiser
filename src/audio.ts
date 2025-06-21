@@ -13,17 +13,17 @@ export class AudioManager {
     this.dataArray = new Uint8Array(bufferLength);
   }
 
-  async initialize(): Promise<boolean> {
+  async initialize(): Promise<MediaStream | undefined> {
     try {
       this.audioContext.resume()
       const stream = await navigator.mediaDevices.getDisplayMedia({ audio: true });
       const source = this.audioContext.createMediaStreamSource(stream);
       source.connect(this.analyser);
       this.isInitialized = true;
-      return true;
+      return stream;
     } catch (err) {
       console.error('Error capturing system audio:', err);
-      return false;
+      return undefined;
     }
   }
 
