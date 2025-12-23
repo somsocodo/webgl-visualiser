@@ -8,6 +8,7 @@ export class Controls {
   private controlsContainer: HTMLElement;
   private prevButton: HTMLElement;
   private nextButton: HTMLElement;
+  private presetNameElement: HTMLElement;
   private hideTimeout: number | undefined;
 
   constructor(
@@ -21,6 +22,9 @@ export class Controls {
     this.controlsContainer = document.getElementById("controls") as HTMLElement;
     this.prevButton = document.getElementById("prevPreset") as HTMLElement;
     this.nextButton = document.getElementById("nextPreset") as HTMLElement;
+    this.presetNameElement = document.getElementById(
+      "presetName",
+    ) as HTMLElement;
 
     this.setupEventListeners();
   }
@@ -28,10 +32,12 @@ export class Controls {
   private setupEventListeners() {
     this.prevButton.addEventListener("click", () => {
       this.butterchurnManager.prevPreset();
+      this.updatePresetName();
     });
 
     this.nextButton.addEventListener("click", () => {
       this.butterchurnManager.nextPreset();
+      this.updatePresetName();
     });
 
     this.initButton.addEventListener("click", async () => {
@@ -39,11 +45,17 @@ export class Controls {
     });
   }
 
+  private updatePresetName() {
+    this.presetNameElement.innerText =
+      this.butterchurnManager.getCurrentPresetName();
+  }
+
   private async initializeAudio() {
     const stream = await this.audioManager.initialize();
     if (stream && stream.active) {
       this.butterchurnManager.connectAudio(this.audioManager.analyser);
       this.butterchurnManager.loadPreset(0);
+      this.updatePresetName();
 
       stream.addEventListener("inactive", () => {
         this.butterchurnManager.loadBlankPreset();

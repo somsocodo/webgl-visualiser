@@ -29,6 +29,11 @@ export class ButterchurnManager {
     const presetName = this.presetKeys[index];
     const preset = this.presets[presetName];
     this.visualizer.loadPreset(preset, 1);
+    this.currentPresetIndex = index;
+  }
+
+  getCurrentPresetName(): string {
+    return this.presetKeys[this.currentPresetIndex];
   }
 
   nextPreset() {
