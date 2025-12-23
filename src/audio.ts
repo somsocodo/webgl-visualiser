@@ -1,7 +1,7 @@
 export class AudioManager {
   audioContext: AudioContext;
   analyser: AnalyserNode;
-  dataArray: Uint8Array;
+  dataArray: Uint8Array<ArrayBuffer>;
   isInitialized: boolean = false;
 
   constructor() {
