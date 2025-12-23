@@ -63,7 +63,8 @@ export class Controls {
         if (this.controlsContainer)
           this.controlsContainer.style.display = "none";
 
-        window.removeEventListener("mousemove", this.handleMouseMove);
+        window.removeEventListener("mousemove", this.handleUserActivity);
+        window.removeEventListener("click", this.handleUserActivity);
         if (this.hideTimeout) clearTimeout(this.hideTimeout);
         document.body.style.cursor = "default";
       });
@@ -72,11 +73,12 @@ export class Controls {
       this.controlsContainer.style.display = "flex";
 
       this.resetHideTimeout();
-      window.addEventListener("mousemove", this.handleMouseMove);
+      window.addEventListener("mousemove", this.handleUserActivity);
+      window.addEventListener("click", this.handleUserActivity);
     }
   }
 
-  private handleMouseMove = () => {
+  private handleUserActivity = () => {
     this.resetHideTimeout();
   };
 
