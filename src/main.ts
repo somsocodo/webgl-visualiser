@@ -1,49 +1,66 @@
 import { AudioManager } from "./audio";
-import { Renderer } from "./renderer";
+import { ButterchurnManager } from "./butterchurn";
 
 const canvas = document.getElementById(
   "visualiser",
 ) as HTMLCanvasElement | null;
 if (canvas === null) throw new Error("Could not find canvas element");
 
-const gl = canvas.getContext("webgl");
-if (gl === null) throw new Error("Could not get WebGL context");
-
-gl.clearColor(0.5, 0.5, 0.5, 1.0);
-gl.enable(gl.DEPTH_TEST);
+const audioManager = new AudioManager();
+const butterchurnManager = new ButterchurnManager(
+  audioManager.audioContext,
+  canvas,
+);
 
 const resizeCanvas = () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };
-
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-const audioManager = new AudioManager();
-const renderer = new Renderer(gl);
-
-const draw = () => {
-  const frequencyData = audioManager.getFrequencyData();
-  renderer.render(frequencyData);
-  requestAnimationFrame(draw);
+const resizeVisualizer = () => {
+  butterchurnManager.resize(canvas.width, canvas.height);
 };
+window.addEventListener("resize", resizeVisualizer);
+resizeVisualizer();
+
+const prevButton = document.getElementById("prevPreset");
+const nextButton = document.getElementById("nextPreset");
+
+prevButton?.addEventListener("click", () => {
+  butterchurnManager.prevPreset();
+});
+
+nextButton?.addEventListener("click", () => {
+  butterchurnManager.nextPreset();
+});
 
 document.getElementById("init")?.addEventListener("click", async () => {
   const stream = await audioManager.initialize();
-  if (stream) {
-    const [track] = stream.getVideoTracks();
+  if (stream && stream.active) {
+    butterchurnManager.connectAudio(audioManager.analyser);
+    butterchurnManager.loadPreset(0);
+
     const initButton = document.getElementById("init");
+    const controls = document.getElementById("controls");
 
-    if (initButton === null) throw new Error("Could not find init button");
-    track.addEventListener("ended", () => {
-      initButton.style.display = "block";
-    });
-    initButton.style.display = "none";
+    if (initButton && controls) {
+      stream.addEventListener("inactive", () => {
+        butterchurnManager.loadBlankPreset();
+        initButton.style.display = "block";
+        if (controls) controls.style.display = "none";
+      });
 
-    draw();
+      initButton.style.display = "none";
+      controls.style.display = "flex";
+    }
   }
 });
+
+const draw = () => {
+  butterchurnManager.render();
+  requestAnimationFrame(draw);
+};
+
+draw();
