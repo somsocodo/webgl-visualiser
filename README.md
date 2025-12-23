@@ -2,8 +2,6 @@
 
 A simple WebGL audio visualiser.
 
-_This project was developed with assistance from Claude Sonnet 3.7_
-
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/)
