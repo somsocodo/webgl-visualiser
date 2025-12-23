@@ -16,16 +16,29 @@ export class AudioManager {
 
   async initialize(): Promise<MediaStream | undefined> {
     try {
-      this.audioContext.resume();
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        audio: true,
-      });
+      await this.audioContext.resume();
+      let stream: MediaStream;
+
+      try {
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          audio: true,
+        });
+      } catch (err) {
+        console.warn(
+          "System audio capture failed or not supported, falling back to microphone:",
+          err,
+        );
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+      }
+
       const source = this.audioContext.createMediaStreamSource(stream);
       source.connect(this.analyser);
       this.isInitialized = true;
       return stream;
     } catch (err) {
-      console.error("Error capturing system audio:", err);
+      console.error("Error capturing audio:", err);
       return undefined;
     }
   }
