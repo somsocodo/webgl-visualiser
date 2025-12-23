@@ -22,4 +22,5 @@ body {
   transform: translateX(-50%);
   display: none;
   gap: 10px;
+  transition: opacity 0.3s ease-in-out;
 }
